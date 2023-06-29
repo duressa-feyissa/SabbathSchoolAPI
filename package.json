@@ -1,0 +1,26 @@
+{
+  "name": "sabbathschoolapi",
+  "version": "1.0.0",
+  "description": "Sabbath School is a function of the Seventh-day Adventist Church, Seventh Day Baptist, Church of God, some other sabbatarian denominations, usually comprising a song service and Bible study lesson on the Sabbath. It is usually held before the church service on Saturday morning, but this may vary.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/duressa-feyissa/SabbathSchoolAPI.git"
+  },
+  "keywords": [
+    "Sabbath",
+    "School"
+  ],
+  "author": "Duresa Feyisa",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "joi": "^17.9.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^7.3.1",
+    "nodemon": "^2.0.22"
+  }
+}
