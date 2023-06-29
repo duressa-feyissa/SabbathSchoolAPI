@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const url = 'mongodb://localhost:27017/MenuHub';
+const url = 'mongodb://localhost:27017/SabbathSchool';
 const options = { useNewUrlParser: true, useUnifiedTopology: true };
 
 module.exports = function() {
