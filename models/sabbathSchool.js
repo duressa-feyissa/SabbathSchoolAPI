@@ -123,7 +123,6 @@ function validateQuarter(quarter) {
     human_date: Joi.string().required(),
     start_date: Joi.date().required(),
     end_date: Joi.date().required(),
-    index: Joi.string().required(),
     id: Joi.string().required(),
     cover: Joi.string().required(),
   });
@@ -137,7 +136,6 @@ function validateLesson(lesson) {
     id: Joi.string().required(),
     cover: Joi.string(),
     end_date: Joi.string(),
-    index: Joi.string().required(),
   });
   return lessonSchema.validate(lesson);
 }
@@ -147,7 +145,6 @@ function validateDay(day) {
     title: Joi.string().required(),
     date: Joi.string().required(),
     id: Joi.string().required(),
-    index: Joi.string().required(),
     read: Joi.string().required(),
   });
   return daySchema.validate(day);
