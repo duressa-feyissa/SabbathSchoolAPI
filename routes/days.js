@@ -3,7 +3,7 @@ const router = express.Router();
 const { SabbathSchool, validateDay } = require("../models/sabbathSchool");
 
 router.post(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id/days",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
   async (req, res) => {
     try {
       const { error } = validateDay(req.body);
@@ -54,7 +54,7 @@ router.post(
 );
 
 router.get(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id/days",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -90,7 +90,7 @@ router.get(
 );
 
 router.get(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id/days/:day_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;
@@ -131,7 +131,7 @@ router.get(
 );
 
 router.put(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id/days/:day_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
   async (req, res) => {
     try {
       const { error } = validateDay(req.body);
@@ -178,7 +178,7 @@ router.put(
 );
 
 router.delete(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id/days/:day_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;

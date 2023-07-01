@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateQuarter } = require("../models/sabbathSchool");
 
-router.post("/:lang/quarterlies", async (req, res) => {
+router.post("/:lang/quarters", async (req, res) => {
   try {
     const { lang } = req.params;
 
@@ -38,7 +38,7 @@ router.post("/:lang/quarterlies", async (req, res) => {
   }
 });
 
-router.get("/:lang/quarterlies", async (req, res) => {
+router.get("/:lang/quarters", async (req, res) => {
   try {
     const { lang } = req.params;
 
@@ -54,7 +54,7 @@ router.get("/:lang/quarterlies", async (req, res) => {
   }
 });
 
-router.get("/:lang/quarterlies/:quarter_id", async (req, res) => {
+router.get("/:lang/quarters/:quarter_id", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 
@@ -77,7 +77,7 @@ router.get("/:lang/quarterlies/:quarter_id", async (req, res) => {
   }
 });
 
-router.put("/:lang/quarterlies/:quarter_id", async (req, res) => {
+router.put("/:lang/quarters/:quarter_id", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 
@@ -107,7 +107,7 @@ router.put("/:lang/quarterlies/:quarter_id", async (req, res) => {
   }
 });
 
-router.delete("/:lang/quarterlies/:quarter_id", async (req, res) => {
+router.delete("/:lang/quarters/:quarter_id", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 

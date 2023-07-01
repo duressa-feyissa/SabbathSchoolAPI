@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateLanguage } = require("../models/sabbathSchool");
 
-router.get("/languages", async (req, res) => {
+router.get("/", async (req, res) => {
   const { sort, order } = req.params;
   let languages = [];
   if (sort)
@@ -14,7 +14,7 @@ router.get("/languages", async (req, res) => {
   res.send(languages);
 });
 
-router.get("/languages/:lang", async (req, res) => {
+router.get("/:lang", async (req, res) => {
   const language = await SabbathSchool.findOne({ code: req.params.lang });
   if (!language)
     return res
@@ -23,7 +23,7 @@ router.get("/languages/:lang", async (req, res) => {
   res.send(language);
 });
 
-router.post("/languages", async (req, res) => {
+router.post("/", async (req, res) => {
   const { error } = validateLanguage(req.body);
 
   if (error) return res.status(400).send(error.details[0].message);
@@ -40,7 +40,7 @@ router.post("/languages", async (req, res) => {
   res.send(language);
 });
 
-router.put("/languages/:lang", async (req, res) => {
+router.put("/:lang", async (req, res) => {
   const { error } = validateLanguage(req.body);
 
   if (error) return res.status(400).send(error.details[0].message);
@@ -62,7 +62,7 @@ router.put("/languages/:lang", async (req, res) => {
   res.send(language);
 });
 
-router.delete("/languages/:lang", async (req, res) => {
+router.delete("/:lang", async (req, res) => {
   const language = await SabbathSchool.findOneAndRemove({
     code: req.params.lang,
   });

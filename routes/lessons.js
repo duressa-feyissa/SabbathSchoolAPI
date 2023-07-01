@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateLesson } = require("../models/sabbathSchool");
 
-router.get("/:lang/quarterlies/:quarter_id/lessons", async (req, res) => {
+router.get("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 
@@ -27,7 +27,7 @@ router.get("/:lang/quarterlies/:quarter_id/lessons", async (req, res) => {
 });
 
 router.get(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -62,7 +62,7 @@ router.get(
   }
 );
 
-router.post("/:lang/quarterlies/:quarter_id/lessons", async (req, res) => {
+router.post("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 
@@ -104,7 +104,7 @@ router.post("/:lang/quarterlies/:quarter_id/lessons", async (req, res) => {
 });
 
 router.put(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -153,7 +153,7 @@ router.put(
 );
 
 router.delete(
-  "/:lang/quarterlies/:quarter_id/lessons/:lesson_id",
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id",
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
