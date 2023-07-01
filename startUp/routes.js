@@ -7,6 +7,7 @@ const years = require("../routes/years");
 const quarters = require("../routes/quarters");
 const lessons = require("../routes/lessons");
 const days = require("../routes/days");
+const reads = require("../routes/reads");
 
 module.exports = function (app) {
   app.use(express.json());
@@ -16,6 +17,7 @@ module.exports = function (app) {
   app.use("/api/v1", quarters);
   app.use("/api/v1", lessons);
   app.use("/api/v1", days);
+  app.use("/api/v1", reads);
   app.use(multerError);
   app.use(error);
 };

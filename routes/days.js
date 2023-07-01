@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateDay } = require("../models/sabbathSchool");
+const { Read, validateRead } = require("../models/read");
+
+const baseurl = "http://localhost:3000/api/v1";
 
 router.post(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
@@ -38,10 +41,19 @@ router.post(
       if (existingDay)
         return res.status(400).send("A day with the same ID already exists.");
 
+      const path = `${baseurl}/${lang}/quarters/${quarter_id}/lessons/${lesson_id}/days/${req.body.id}/read`;
       const day = {
         ...req.body,
         index,
+        read: path,
       };
+
+      data = { read: req.body.read, id: index };
+      const { readError } = validateRead(data);
+      if (readError) return res.status(400).send(readError.details[0].message);
+
+      const read = new Read(data);
+      await read.save();
 
       lesson.days.push(day);
       await sabbathSchool.save();
@@ -49,6 +61,7 @@ router.post(
       res.send(day);
     } catch (error) {
       res.status(500).send("Server error");
+      console.log(error);
     }
   }
 );
@@ -58,8 +71,6 @@ router.get(
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
-      const index = `${lang}_${quarter_id}_${lesson_id}`;
-
       const sabbathSchool = await SabbathSchool.findOne({
         "quarters.index": `${lang}_${quarter_id}`,
       });
@@ -214,6 +225,8 @@ router.delete(
       const day = lesson.days[dayIndex];
       lesson.days.splice(dayIndex, 1);
       await sabbathSchool.save();
+
+      await Read.findOneAndDelete({ id: index });
 
       res.send(day);
     } catch (error) {
