@@ -9,6 +9,8 @@ const lessons = require("../routes/lessons");
 const days = require("../routes/days");
 const reads = require("../routes/reads");
 const intrductions = require("../routes/introductions");
+const users = require("../routes/users");
+const auth = require("../routes/auth");
 const path = require("path");
 
 module.exports = function (app) {
@@ -21,6 +23,8 @@ module.exports = function (app) {
   app.use("/api/v1", days);
   app.use("/api/v1", reads);
   app.use("/api/v1", intrductions);
+  app.use("/api/v1/users", users);
+  app.use("/api/v1/auth", auth);
   app.use(multerError);
   app.use(error);
   app.use(express.static(path.join(__dirname, "../uploads")));

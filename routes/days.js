@@ -3,11 +3,15 @@ const router = express.Router();
 const { SabbathSchool, validateDay } = require("../models/sabbathSchool");
 const { Read, validateRead } = require("../models/read");
 const config = require("config");
+const authenticate = require("../middleWare/authentication");
+const authorize = require("../middleWare/authorization");
 
 const baseurl = config.get("base_url");
 
 router.post(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
+  authenticate,
+  authorize(["admin"]),
   async (req, res) => {
     try {
       const { error } = validateDay(req.body);
@@ -73,6 +77,8 @@ router.post(
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
+  authenticate,
+  authorize(["admin", "user"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -107,6 +113,8 @@ router.get(
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
+  authenticate,
+  authorize(["admin", "user"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;
@@ -148,6 +156,8 @@ router.get(
 
 router.put(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
+  authenticate,
+  authorize(["admin"]),
   async (req, res) => {
     try {
       const { error } = validateDay(req.body);
@@ -217,6 +227,8 @@ router.put(
 
 router.delete(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id",
+  authenticate,
+  authorize(["admin"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;

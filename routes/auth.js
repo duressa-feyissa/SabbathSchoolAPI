@@ -3,8 +3,9 @@ const { User } = require("../models/user");
 const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
+const authenticate = require("../middleWare/authentication");
 
-router.get("/me", auth, async (req, res) => {
+router.get("/me", authenticate, async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId).select("-password");

@@ -6,33 +6,42 @@ const config = require("config");
 const base_url = config.get("base_url");
 const upload = require("../middleWare/upload");
 const path = require("path");
+const authenticate = require("../middleWare/authentication");
+const authorize = require("../middleWare/authorization");
 
-router.get("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
-  try {
-    const { lang, quarter_id } = req.params;
+router.get(
+  "/:lang/quarters/:quarter_id/lessons",
+  authenticate,
+  authorize(["admin", "user"]),
+  async (req, res) => {
+    try {
+      const { lang, quarter_id } = req.params;
 
-    const sabbathSchool = await SabbathSchool.findOne({
-      "quarters.index": `${lang}_${quarter_id}`,
-    });
+      const sabbathSchool = await SabbathSchool.findOne({
+        "quarters.index": `${lang}_${quarter_id}`,
+      });
 
-    if (!sabbathSchool)
-      return res
-        .status(404)
-        .send("The quarter with the given ID was not found.");
+      if (!sabbathSchool)
+        return res
+          .status(404)
+          .send("The quarter with the given ID was not found.");
 
-    const quarter = sabbathSchool.quarters.find(
-      (q) => q.index === `${lang}_${quarter_id}`
-    );
+      const quarter = sabbathSchool.quarters.find(
+        (q) => q.index === `${lang}_${quarter_id}`
+      );
 
-    res.send(quarter.lessons);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server error");
+      res.send(quarter.lessons);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server error");
+    }
   }
-});
+);
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id",
+  authenticate,
+  authorize(["admin", "user"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -67,49 +76,58 @@ router.get(
   }
 );
 
-router.post("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
-  try {
-    const { lang, quarter_id } = req.params;
+router.post(
+  "/:lang/quarters/:quarter_id/lessons",
+  authenticate,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const { lang, quarter_id } = req.params;
 
-    const { error } = validateLesson(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+      const { error } = validateLesson(req.body);
+      if (error) return res.status(400).send(error.details[0].message);
 
-    const { id } = req.body;
+      const { id } = req.body;
 
-    const sabbathSchool = await SabbathSchool.findOne({
-      "quarters.index": `${lang}_${quarter_id}`,
-    });
+      const sabbathSchool = await SabbathSchool.findOne({
+        "quarters.index": `${lang}_${quarter_id}`,
+      });
 
-    if (!sabbathSchool)
-      return res
-        .status(404)
-        .send("The quarter with the given ID was not found.");
+      if (!sabbathSchool)
+        return res
+          .status(404)
+          .send("The quarter with the given ID was not found.");
 
-    const quarter = sabbathSchool.quarters.find(
-      (q) => q.index === `${lang}_${quarter_id}`
-    );
+      const quarter = sabbathSchool.quarters.find(
+        (q) => q.index === `${lang}_${quarter_id}`
+      );
 
-    const existingLesson = quarter.lessons.find((lesson) => lesson.id === id);
-    if (existingLesson)
-      return res.status(400).send("A lesson with the same ID already exists.");
+      const existingLesson = quarter.lessons.find((lesson) => lesson.id === id);
+      if (existingLesson)
+        return res
+          .status(400)
+          .send("A lesson with the same ID already exists.");
 
-    const lesson = {
-      ...req.body,
-      index: `${lang}_${quarter_id}_${id}`,
-    };
+      const lesson = {
+        ...req.body,
+        index: `${lang}_${quarter_id}_${id}`,
+      };
 
-    quarter.lessons.push(lesson);
-    await sabbathSchool.save();
+      quarter.lessons.push(lesson);
+      await sabbathSchool.save();
 
-    res.send(quarter.lessons);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server error");
+      res.send(quarter.lessons);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server error");
+    }
   }
-});
+);
 
 router.put(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id",
+  authenticate,
+  authorize(["admin"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -162,6 +180,8 @@ router.put(
 
 router.delete(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id",
+  authenticate,
+  authorize(["admin"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -197,6 +217,8 @@ router.delete(
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/image",
+  authenticate,
+  authorize(["admin", "user"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -246,6 +268,8 @@ router.get(
 
 router.post(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/image",
+  authenticate,
+  authorize(["admin"]),
   upload.single("image"),
   async (req, res) => {
     try {

@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { Read } = require("../models/read");
+const authenticate = require("../middleWare/authentication");
+const authorize = require("../middleWare/authorization");
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id/read",
+  authenticate,
+  authorize(["admin", "user"]),
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;
