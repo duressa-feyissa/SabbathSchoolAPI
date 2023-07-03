@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateLesson } = require("../models/sabbathSchool");
 const { Read } = require("../models/read");
+const config = require("config");
+const base_url = config.get("base_url");
+const upload = require("../middleWare/upload");
+const path = require("path");
 
 router.get("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
   try {
@@ -186,6 +190,99 @@ router.delete(
       res.send(quarter.lessons);
     } catch (error) {
       console.log(error);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
+router.get(
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/image",
+  async (req, res) => {
+    try {
+      const { lang, quarter_id, lesson_id } = req.params;
+
+      const sabbathSchool = await SabbathSchool.findOne({
+        "quarters.index": `${lang}_${quarter_id}`,
+      });
+
+      if (!sabbathSchool) {
+        return res
+          .status(404)
+          .send("The quarter with the given ID was not found.");
+      }
+
+      const quarter = sabbathSchool.quarters.find(
+        (q) => q.index === `${lang}_${quarter_id}`
+      );
+
+      const lesson = quarter.lessons.find(
+        (l) => l.index === `${lang}_${quarter_id}_${lesson_id}`
+      );
+
+      if (!lesson) {
+        return res
+          .status(404)
+          .send("The lesson with the given ID was not found.");
+      }
+
+      const imagePath = lesson.cover;
+
+      if (!imagePath) {
+        return res
+          .status(404)
+          .send("Image not found for the specified lesson.");
+      }
+
+      const imageName = imagePath.split("/").pop();
+
+      const imageFilePath = path.join(__dirname, "../uploads", imageName);
+      res.sendFile(imageFilePath);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
+router.post(
+  "/:lang/quarters/:quarter_id/lessons/:lesson_id/image",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { lang, quarter_id, lesson_id } = req.params;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).send("Please upload a file");
+      }
+
+      const sabbathSchool = await SabbathSchool.findOneAndUpdate(
+        {
+          "quarters.index": `${lang}_${quarter_id}`,
+          "quarters.lessons.id": lesson_id,
+        },
+        {
+          $set: {
+            "quarters.$[q].lessons.$[l].cover": `${base_url}/${lang}/quarters/${quarter_id}/lessons/${lesson_id}/${file.filename}`,
+          },
+        },
+        {
+          arrayFilters: [
+            { "q.index": `${lang}_${quarter_id}` },
+            { "l.id": lesson_id },
+          ],
+          new: true,
+        }
+      );
+
+      if (!sabbathSchool) {
+        return res
+          .status(404)
+          .send("The lesson with the given ID was not found.");
+      }
+
+      res.send("File uploaded successfully.");
+    } catch (error) {
       res.status(500).send("Server error");
     }
   }

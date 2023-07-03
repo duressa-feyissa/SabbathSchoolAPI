@@ -4,7 +4,8 @@ const { SabbathSchool, validateQuarter } = require("../models/sabbathSchool");
 const { Read } = require("../models/read");
 const config = require("config");
 const { Introduction } = require("../models/introduction");
-
+const upload = require("../middleWare/upload");
+const path = require("path");
 const base_url = config.get("base_url");
 
 router.post("/:lang/quarters", async (req, res) => {
@@ -159,7 +160,7 @@ router.delete("/:lang/quarters/:quarter_id", async (req, res) => {
   }
 });
 
-router.post("/:lang/quarters/:quarter_id/image", async (req, res) => {
+router.get("/:lang/quarters/:quarter_id/image", async (req, res) => {
   try {
     const { lang, quarter_id } = req.params;
 
@@ -167,19 +168,66 @@ router.post("/:lang/quarters/:quarter_id/image", async (req, res) => {
       "quarters.index": `${lang}_${quarter_id}`,
     });
 
-    if (!sabbathSchool)
+    if (!sabbathSchool) {
       return res
         .status(404)
         .send("The quarter with the given ID was not found.");
+    }
 
     const quarter = sabbathSchool.quarters.find(
       (q) => q.index === `${lang}_${quarter_id}`
     );
 
-    res.send(quarter);
+    const imagePath = quarter.cover;
+
+    if (!imagePath) {
+      return res.status(404).send("Image not found for the specified quarter.");
+    }
+
+    const imageName = imagePath.split("/").pop();
+
+    const imageFilePath = path.join(__dirname, "../uploads", imageName);
+    res.sendFile(imageFilePath);
   } catch (error) {
+    console.error(error);
     res.status(500).send("Server error");
   }
 });
+
+router.post(
+  "/:lang/quarters/:quarter_id/image",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { lang, quarter_id } = req.params;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).send("Please upload a file");
+      }
+
+      const sabbathSchool = await SabbathSchool.findOneAndUpdate(
+        {
+          "quarters.index": `${lang}_${quarter_id}`,
+        },
+        {
+          $set: {
+            "quarters.$.cover": `${base_url}/${lang}/quarters/${quarter_id}/${file.filename}`,
+          },
+        },
+        { new: true }
+      );
+
+      if (!sabbathSchool) {
+        return res
+          .status(404)
+          .send("The quarter with the given ID was not found.");
+      }
+      res.send("File uploaded successfully.");
+    } catch (error) {
+      res.status(500).send("Server error");
+    }
+  }
+);
 
 module.exports = router;

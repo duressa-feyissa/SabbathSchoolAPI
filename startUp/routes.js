@@ -9,6 +9,7 @@ const lessons = require("../routes/lessons");
 const days = require("../routes/days");
 const reads = require("../routes/reads");
 const intrductions = require("../routes/introductions");
+const path = require("path");
 
 module.exports = function (app) {
   app.use(express.json());
@@ -22,4 +23,5 @@ module.exports = function (app) {
   app.use("/api/v1", intrductions);
   app.use(multerError);
   app.use(error);
+  app.use(express.static(path.join(__dirname, "../uploads")));
 };
