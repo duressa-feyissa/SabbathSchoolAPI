@@ -16,7 +16,6 @@ router.post("/:lang/quarters", async (req, res) => {
     if (!sabbathSchool)
       return res.status(404).send("The language was not found.");
 
-    // Check if the quarter with the given ID already exists
     const existingQuarter = sabbathSchool.quarters.find(
       (quarter) => quarter.id === id
     );
@@ -123,6 +122,29 @@ router.delete("/:lang/quarters/:quarter_id", async (req, res) => {
         .send("The quarter with the given ID was not found.");
 
     res.send(sabbathSchool.quarters);
+  } catch (error) {
+    res.status(500).send("Server error");
+  }
+});
+
+router.post("/:lang/quarters/:quarter_id/image", async (req, res) => {
+  try {
+    const { lang, quarter_id } = req.params;
+
+    const sabbathSchool = await SabbathSchool.findOne({
+      "quarters.index": `${lang}_${quarter_id}`,
+    });
+
+    if (!sabbathSchool)
+      return res
+        .status(404)
+        .send("The quarter with the given ID was not found.");
+
+    const quarter = sabbathSchool.quarters.find(
+      (q) => q.index === `${lang}_${quarter_id}`
+    );
+
+    res.send(quarter);
   } catch (error) {
     res.status(500).send("Server error");
   }

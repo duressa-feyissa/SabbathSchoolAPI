@@ -27,11 +27,11 @@ const schema = new mongoose.Schema({
         required: true,
       },
       start_date: {
-        type: Date,
+        type: String,
         required: true,
       },
       end_date: {
-        type: Date,
+        type: String,
         required: true,
       },
       index: {
@@ -46,7 +46,15 @@ const schema = new mongoose.Schema({
       },
       cover: {
         type: String,
-        required: true,
+      },
+      color_primary: {
+        type: String,
+      },
+      color_primary_dark: {
+        type: String,
+      },
+      introduction: {
+        type: String,
       },
       lessons: [
         {
@@ -55,7 +63,7 @@ const schema = new mongoose.Schema({
             required: true,
           },
           start_date: {
-            type: Date,
+            type: String,
             required: true,
           },
           id: {
@@ -67,7 +75,7 @@ const schema = new mongoose.Schema({
             type: String,
           },
           end_date: {
-            type: Date,
+            type: String,
           },
           index: {
             type: String,
@@ -81,7 +89,7 @@ const schema = new mongoose.Schema({
                 required: true,
               },
               date: {
-                type: Date,
+                type: String,
                 required: true,
               },
               id: {
@@ -121,10 +129,13 @@ function validateQuarter(quarter) {
     title: Joi.string().required(),
     description: Joi.string().required(),
     human_date: Joi.string().required(),
-    start_date: Joi.date().required(),
-    end_date: Joi.date().required(),
+    start_date: Joi.string().required(),
+    end_date: Joi.string().required(),
+    color_primary: Joi.string(),
+    color_primary_dark: Joi.string(),
     id: Joi.string().required(),
-    cover: Joi.string().required(),
+    introduction: Joi.string(),
+    cover: Joi.string(),
   });
   return quarterSchema.validate(quarter);
 }
