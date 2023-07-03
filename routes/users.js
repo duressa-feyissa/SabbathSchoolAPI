@@ -7,72 +7,57 @@ const authorize = require("../middleWare/authorization");
 
 const router = express.Router();
 
-router.get(
-  "/",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      const users = await User.find().select("-password");
-      res.send(users);
-    } catch (error) {
-      res.status(500).send("Server error");
-    }
+router.get("/", authenticate, authorize(["admin"]), async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.send(users);
+  } catch (error) {
+    res.status(500).send("Server error");
   }
-);
+});
 
-router.get(
-  "/:id",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      if (!mongoose.isValidObjectId(req.params.id))
-        return res.status(400).send("Invalid user ID");
+router.get("/:id", authenticate, authorize(["admin"]), async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id))
+      return res.status(400).send("Invalid user ID");
 
-      const user = await User.findById(req.params.id).select("-password");
-      if (!user) return res.status(404).send("User not found");
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).send("User not found");
 
-      res.send(user);
-    } catch (error) {
-      res.status(500).send("Server error");
-    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send("Server error");
   }
-);
+});
 
-router.post(
-  "/",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      const { error } = validateUser(req.body);
-      if (error) return res.status(400).send(error.details[0].message);
+router.post("/", async (req, res) => {
+  try {
+    const { error } = validateUser(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-      let user = await User.findOne({ email: req.body.email });
-      if (user) return res.status(400).send("User already registered");
+    let user = await User.findOne({ email: req.body.email });
+    if (user) return res.status(400).send("User already registered");
 
-      user = new User({
-        name: req.body.name,
-        password: req.body.password,
-        email: req.body.email,
-        role: req.body.role,
-      });
+    user = new User({
+      name: req.body.name,
+      password: req.body.password,
+      email: req.body.email,
+      role: req.body.role,
+    });
 
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(user.password, salt);
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
 
-      await user.save();
+    await user.save();
 
-      const response = user.toObject();
-      delete response.password;
+    const response = user.toObject();
+    delete response.password;
 
-      res.send(response);
-    } catch (error) {
-      res.status(500).send("Server error");
-    }
+    res.send(response);
+  } catch (error) {
+    res.status(500).send("Server error");
   }
-);
+});
 
 router.put(
   "/:id",

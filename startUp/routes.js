@@ -23,8 +23,8 @@ module.exports = function (app) {
   app.use("/api/v1", days);
   app.use("/api/v1", reads);
   app.use("/api/v1", intrductions);
-  app.use("/api/v1/users", users);
-  app.use("/api/v1/auth", auth);
+  app.use("/api/v2/users", users);
+  app.use("/api/v2/auth", auth);
   app.use(multerError);
   app.use(error);
   app.use(express.static(path.join(__dirname, "../uploads")));
