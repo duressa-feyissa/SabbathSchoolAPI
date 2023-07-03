@@ -31,17 +31,25 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.methods.generateToken = function () {
+  const token = jwt.sign(
+    { _id: this._id, isAdmin: this.isAdmin },
+    config.get("API_Private_Key")
+  );
+  return token;
+};
+
 const User = mongoose.model("User", userSchema);
 
 const validateUser = (user) => {
-  const schema = {
+  const schema = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(8).max(100).required(),
     email: Joi.string().email().required(),
-    role: Joi.string().valid("user", "admin"),
-  };
-  return Joi.validate(user, schema);
+    role: Joi.string().valid("user", "admin").default("user"),
+  });
+  return schema.validate(user);
 };
 
 exports.User = User;
-exports.validate = validateUser;
+exports.validateUser = validateUser;
