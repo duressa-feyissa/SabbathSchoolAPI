@@ -18,7 +18,7 @@ const Read = mongoose.model("Read", schema);
 function validateRead(read) {
   const schema = Joi.object({
     id: Joi.string().required(),
-    paragraphs: Joi.array().items(Joi.string().required()).required(),
+    paragraphs: Joi.array().items(Joi.string().required()).min(1).required(),
   });
 
   return schema.validate(read);

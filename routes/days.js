@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateDay } = require("../models/sabbathSchool");
 const { Read, validateRead } = require("../models/read");
+const config = require("config");
 
-const baseurl = "http://localhost:3000/api/v1";
+const baseurl = config.get("base_url");
 
 router.post(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days",
@@ -41,19 +42,23 @@ router.post(
       if (existingDay)
         return res.status(400).send("A day with the same ID already exists.");
 
+      const readData = {
+        id: index,
+        paragraphs: req.body.read,
+      };
+
+      const { error: readError } = validateRead(readData);
+      if (readError) return res.status(400).send(readError.details[0].message);
+
+      const read = new Read(readData);
+      await read.save();
+
       const path = `${baseurl}/${lang}/quarters/${quarter_id}/lessons/${lesson_id}/days/${req.body.id}/read`;
       const day = {
         ...req.body,
         index,
         read: path,
       };
-
-      data = { read: req.body.read, id: index };
-      const { readError } = validateRead(data);
-      if (readError) return res.status(400).send(readError.details[0].message);
-
-      const read = new Read(data);
-      await read.save();
 
       lesson.days.push(day);
       await sabbathSchool.save();
@@ -173,12 +178,34 @@ router.put(
           .status(404)
           .send("The lesson with the given ID was not found.");
 
-      const day = lesson.days.find((d) => d.index === index);
+      let day = lesson.days.find((d) => d.index === index);
 
       if (!day)
         return res.status(404).send("The day with the given ID was not found.");
 
-      Object.assign(day, req.body);
+      const readData = {
+        id: index,
+        paragraphs: req.body.read,
+      };
+
+      const { error: readError } = validateRead(readData);
+      if (readError) return res.status(400).send(readError.details[0].message);
+
+      await Read.findOneAndUpdate(
+        { id: index },
+        { $set: readData },
+        { new: true }
+      );
+
+      const path = `${baseurl}/${lang}/quarters/${quarter_id}/lessons/${lesson_id}/days/${day_id}/read`;
+      const newday = {
+        ...req.body,
+        id: day_id,
+        index,
+        read: path,
+      };
+
+      Object.assign(day, newday);
       await sabbathSchool.save();
 
       res.send(day);
@@ -227,6 +254,11 @@ router.delete(
       await sabbathSchool.save();
 
       await Read.findOneAndDelete({ id: index });
+
+      const langPattern = new RegExp(
+        `^${lang}_${quarter_id}_${lesson_id}_${day_id}`
+      );
+      await Read.deleteMany({ id: langPattern });
 
       res.send(day);
     } catch (error) {

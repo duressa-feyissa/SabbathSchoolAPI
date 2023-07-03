@@ -13,16 +13,15 @@ const schema = new mongoose.Schema({
   },
 });
 
-const Read = mongoose.model("Read", schema);
+const Introduction = mongoose.model("Introductions", schema);
 
-function validateRead(read) {
+function validateIntroduction(read) {
   const schema = Joi.object({
-    id: Joi.string().required(),
     paragraphs: Joi.array().items(Joi.string().required()).required(),
   });
 
   return schema.validate(read);
 }
 
-exports.Read = Read;
-exports.validateRead = validateRead;
+exports.Introduction = Introduction;
+exports.validateIntroduction = validateIntroduction;

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateLesson } = require("../models/sabbathSchool");
+const { Read } = require("../models/read");
 
 router.get("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
   try {
@@ -112,39 +113,42 @@ router.put(
       const { error } = validateLesson(req.body);
       if (error) return res.status(400).send(error.details[0].message);
 
-      const updatedLesson = {
-        ...req.body,
-        index: `${lang}_${quarter_id}_${req.body.id}`,
-      };
+      const existingLesson = await SabbathSchool.findOne({
+        "quarters.index": `${lang}_${quarter_id}`,
+        "quarters.lessons.id": lesson_id,
+      });
 
-      const sabbathSchool = await SabbathSchool.findOneAndUpdate(
-        {
-          "quarters.index": `${lang}_${quarter_id}`,
-          "quarters.lessons.id": lesson_id,
-        },
-        { $set: { "quarters.$[q].lessons.$[l]": updatedLesson } },
-        {
-          arrayFilters: [
-            { "q.index": `${lang}_${quarter_id}` },
-            { "l.id": lesson_id },
-          ],
-          new: true,
-        }
-      );
-
-      if (!sabbathSchool)
+      if (!existingLesson)
         return res
           .status(404)
           .send("The lesson with the given ID was not found.");
 
-      const quarter = sabbathSchool.quarters.find(
+      const existingQuarter = existingLesson.quarters.find(
         (q) => q.index === `${lang}_${quarter_id}`
       );
-      const lesson = quarter.lessons.find(
-        (l) => l.index === `${lang}_${quarter_id}_${lesson_id}`
+      const existingLessonIndex = existingQuarter.lessons.findIndex(
+        (l) => l.id === lesson_id
       );
 
-      res.send(lesson);
+      if (existingLessonIndex === -1)
+        return res
+          .status(404)
+          .send("The lesson with the given ID was not found.");
+
+      const existingDays = existingQuarter.lessons[existingLessonIndex].days;
+
+      const updatedLesson = {
+        ...req.body,
+        id: lesson_id,
+        index: `${lang}_${quarter_id}_${lesson_id}`,
+        days: existingDays,
+      };
+
+      existingQuarter.lessons[existingLessonIndex] = updatedLesson;
+
+      await existingLesson.save();
+
+      res.send(updatedLesson);
     } catch (error) {
       console.log(error);
       res.status(500).send("Server error");
@@ -175,6 +179,9 @@ router.delete(
       const quarter = sabbathSchool.quarters.find(
         (q) => q.index === `${lang}_${quarter_id}`
       );
+
+      const langPattern = new RegExp(`^${lang}_${quarter_id}_${lesson_id}_`);
+      await Read.deleteMany({ id: langPattern });
 
       res.send(quarter.lessons);
     } catch (error) {

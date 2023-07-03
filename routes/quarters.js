@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { SabbathSchool, validateQuarter } = require("../models/sabbathSchool");
+const { Read } = require("../models/read");
+const config = require("config");
+const { Introduction } = require("../models/introduction");
+
+const base_url = config.get("base_url");
 
 router.post("/:lang/quarters", async (req, res) => {
   try {
@@ -22,9 +27,12 @@ router.post("/:lang/quarters", async (req, res) => {
     if (existingQuarter)
       return res.status(400).send("A quarter with the same ID already exists.");
 
+    const introUrl = `${base_url}/${lang}/quarters/${id}/introduction`;
+
     const quarter = {
       ...req.body,
       index: `${lang}_${id}`,
+      introduction: introUrl,
     };
 
     sabbathSchool.quarters.push(quarter);
@@ -43,7 +51,7 @@ router.get("/:lang/quarters", async (req, res) => {
 
     const sabbathSchool = await SabbathSchool.findOne({ code: `${lang}` });
 
-    if (!SabbathSchool)
+    if (!sabbathSchool)
       return res
         .status(404)
         .send("The quarter with the given ID was not found.");
@@ -83,14 +91,32 @@ router.put("/:lang/quarters/:quarter_id", async (req, res) => {
     const { error } = validateQuarter(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const updatedQuarter = {
-      ...req.body,
-      index: `${lang}_${req.body.id}`,
-    };
+    let sabbathSchool = await SabbathSchool.findOne({
+      "quarters.index": `${lang}_${quarter_id}`,
+    });
 
-    const sabbathSchool = await SabbathSchool.findOneAndUpdate(
-      { "quarters.id": quarter_id },
-      { $set: { "quarters.$": updatedQuarter } },
+    const quarter = sabbathSchool.quarters.find(
+      (q) => q.index === `${lang}_${quarter_id}`
+    );
+
+    sabbathSchool = await SabbathSchool.findOneAndUpdate(
+      {
+        "quarters.index": `${lang}_${quarter_id}`,
+      },
+      {
+        $set: {
+          "quarters.$.title": req.body.title,
+          "quarters.$.description": req.body.description,
+          "quarters.$.human_date": req.body.human_date,
+          "quarters.$.start_date": req.body.start_date,
+          "quarters.$.end_date": req.body.end_date,
+          "quarters.$.cover": req.body.cover,
+          "quarters.$.color_primary": req.body.color_primary,
+          "quarters.$.color_primary_dark": req.body.color_primary_dark,
+          "quarters.$.introduction": `${base_url}/${lang}/quarters/${quarter_id}/introduction`,
+          "quarters.$.lessons": quarter.lessons,
+        },
+      },
       { new: true }
     );
 
@@ -99,7 +125,7 @@ router.put("/:lang/quarters/:quarter_id", async (req, res) => {
         .status(404)
         .send("The quarter with the given ID was not found.");
 
-    res.send(updatedQuarter);
+    res.send(sabbathSchool.quarters.find((q) => q.id === quarter_id));
   } catch (error) {
     console.log(error);
     res.status(500).send("Server error");
@@ -121,7 +147,13 @@ router.delete("/:lang/quarters/:quarter_id", async (req, res) => {
         .status(404)
         .send("The quarter with the given ID was not found.");
 
-    res.send(sabbathSchool.quarters);
+    const langPattern = new RegExp(`^${lang}_${quarter_id}`);
+    await Read.deleteMany({ id: langPattern });
+
+    await Introduction.deleteMany({ id: langPattern });
+
+    const updatedQuarters = sabbathSchool.quarters;
+    res.send(updatedQuarters);
   } catch (error) {
     res.status(500).send("Server error");
   }
