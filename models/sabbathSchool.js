@@ -22,6 +22,10 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      year: {
+        type: String,
+        required: true,
+      },
       human_date: {
         type: String,
         required: true,
@@ -137,6 +141,7 @@ function validateQuarter(quarter) {
     title: Joi.string().required(),
     description: Joi.string().required(),
     human_date: Joi.string().required(),
+    year: Joi.string().required(),
     start_date: Joi.string().required(),
     end_date: Joi.string().required(),
     color_primary: Joi.string(),
