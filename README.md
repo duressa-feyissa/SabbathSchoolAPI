@@ -11,11 +11,11 @@ For example, to retrieve all available languages, you would send a GET request t
 #### `Fetch Actual Data Using: https://sabbathschool.duresa.com.et/api/v1/`
 
 #### Languages<br/>
-`GET /api/v1/languages: Get all available languages.`<br/>
-`POST /api/v1/languages: Create a new language.`<br/>
-`GET /api/v1/languages/:lang: Get details of a specific language.`<br/>
-`PUT /api/v1/languages/:lang: Update details of a specific language.`<br/>
-`DELETE /api/v1/languages/:lang: Delete a language.`<br/><br/>
+`GET /api/v1/: Get all available languages.`<br/>
+`POST /api/v1/: Create a new language.`<br/>
+`GET /api/v1/:lang: Get details of a specific language.`<br/>
+`PUT /api/v1/:lang: Update details of a specific language.`<br/>
+`DELETE /api/v1/:lang: Delete a language.`<br/><br/>
 
 #### Quarters<br/>
 `GET /api/v1/languages/:lang/quarters: Get all quarters.`<br/>
@@ -25,18 +25,18 @@ For example, to retrieve all available languages, you would send a GET request t
 `DELETE api/v1/languages/:lang/quarters/:id Delete a quarter.`<br/>
 
 #### Lesson<br/><br/>
-`GET /api/v1/languages/:lang/quarters/:id/lessons: Get all lessons.`<br/>
-`POST /api/v1/languages/:lang/quarters/:id/lessons: Create a new lesson.`<br/>
-`GET /api/v1/languages/:lang/quarters/:id/lessons/:id: Get details of a specific lesson.`<br/>
-`PUT /api/v1/languages/:lang/quarters/:id/lessons/:id: Update details of a specific lesson.`<br/>
-`DELETE /api/v1/languages/:lang/quarters/:id/lessons/:id: Delete a lesson.`<br/>
+`GET /api/v1/:lang/quarters/:id/lessons: Get all lessons.`<br/>
+`POST /api/v1/:lang/quarters/:id/lessons: Create a new lesson.`<br/>
+`GET /api/v1/:lang/quarters/:id/lessons/:id: Get details of a specific lesson.`<br/>
+`PUT /api/v1/:lang/quarters/:id/lessons/:id: Update details of a specific lesson.`<br/>
+`DELETE /api/v1/:lang/quarters/:id/lessons/:id: Delete a lesson.`<br/>
 
 #### Day<br/><br/>
-`GET /api/v1/languages/:lang/quarters/:id/lessons/:id:/days: Get all days.`<br/>
-`POST /api/v1/languages/:lang/quarters/:id/lessons/:id:/days: Create a new day.`<br/>
-`GET /api/v1/languages/:lang/quarters/:id/lessons/:id:/days/:id: Get details of a specific day.`<br/>
-`PUT /api/v1/languages/:lang/quarters/:id/lessons/:id:/days/:id: Update details of a specific day.`<br/>
-`DELETE /api/v1/languages/:lang/quarters/:id/lessons/:id:/days/:id: Delete a day.`<br/>
+`GET /api/v1/:lang/quarters/:id/lessons/:id:/days: Get all days.`<br/>
+`POST /api/v1/:lang/quarters/:id/lessons/:id:/days: Create a new day.`<br/>
+`GET /api/v1/:lang/quarters/:id/lessons/:id:/days/:id: Get details of a specific day.`<br/>
+`PUT /api/v1/:lang/quarters/:id/lessons/:id:/days/:id: Update details of a specific day.`<br/>
+`DELETE /api/v1/:lang/quarters/:id/lessons/:id:/days/:id: Delete a day.`<br/>
 
 ### Getting Started
 To get started with the SabbathSchoolAPI, follow these steps:
