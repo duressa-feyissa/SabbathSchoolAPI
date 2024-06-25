@@ -6,8 +6,7 @@ const authorize = require("../middleWare/authorization");
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id/days/:day_id/read",
-  authenticate,
-  authorize(["admin", "user"]),
+
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id, day_id } = req.params;

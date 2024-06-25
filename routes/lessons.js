@@ -9,39 +9,39 @@ const path = require("path");
 const authenticate = require("../middleWare/authentication");
 const authorize = require("../middleWare/authorization");
 
-router.get(
-  "/:lang/quarters/:quarter_id/lessons",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      const { lang, quarter_id } = req.params;
+router.get("/:lang/quarters/:quarter_id/lessons", async (req, res) => {
+  try {
+    const { lang, quarter_id } = req.params;
 
-      const sabbathSchool = await SabbathSchool.findOne({
-        "quarters.index": `${lang}_${quarter_id}`,
-      });
+    const sabbathSchool = await SabbathSchool.findOne({
+      "quarters.index": `${lang}_${quarter_id}`,
+    });
 
-      if (!sabbathSchool)
-        return res
-          .status(404)
-          .send("The quarter with the given ID was not found.");
+    if (!sabbathSchool)
+      return res
+        .status(404)
+        .send("The quarter with the given ID was not found.");
 
-      const quarter = sabbathSchool.quarters.find(
-        (q) => q.index === `${lang}_${quarter_id}`
-      );
+    const quarter = sabbathSchool.quarters.find(
+      (q) => q.index === `${lang}_${quarter_id}`
+    );
 
-      res.send(quarter.lessons);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("Server error");
-    }
+    const lessons = quarter.lessons.map((lesson) => {
+      const { id, title, cover, index, start_date, end_date, memorial_script } =
+        lesson;
+      return { id, title, cover, index, start_date, end_date, memorial_script };
+    });
+
+    res.send(lessons);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
   }
-);
+});
 
 router.get(
   "/:lang/quarters/:quarter_id/lessons/:lesson_id",
-  authenticate,
-  authorize(["admin", "user"]),
+
   async (req, res) => {
     try {
       const { lang, quarter_id, lesson_id } = req.params;
@@ -68,7 +68,15 @@ router.get(
           .status(404)
           .send("The lesson with the given ID was not found.");
 
-      res.send(lesson);
+      res.send({
+        id: lesson.id,
+        title: lesson.title,
+        cover: lesson.cover,
+        index: lesson.index,
+        start_date: lesson.start_date,
+        end_date: lesson.end_date,
+        memorial_script: lesson.memorial_script,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).send("Server error");

@@ -55,54 +55,68 @@ router.post(
   }
 );
 
-router.get(
-  "/:lang/quarters",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      const { lang } = req.params;
+router.get("/:lang/quarters", async (req, res) => {
+  try {
+    const { lang } = req.params;
 
-      const sabbathSchool = await SabbathSchool.findOne({ code: `${lang}` });
+    const sabbathSchool = await SabbathSchool.findOne({ code: `${lang}` });
 
-      if (!sabbathSchool)
-        return res
-          .status(404)
-          .send("The quarter with the given ID was not found.");
-      res.send(sabbathSchool.quarters);
-    } catch (error) {
-      res.status(500).send("Server error");
-    }
+    if (!sabbathSchool)
+      return res
+        .status(404)
+        .send("The quarter with the given ID was not found.");
+
+    const quarters = sabbathSchool.quarters.map((quarter) => {
+      return {
+        title: quarter.title,
+        description: quarter.description,
+        human_date: quarter.human_date,
+        start_date: quarter.start_date,
+        end_date: quarter.end_date,
+        cover: quarter.cover,
+        color_primary: quarter.color_primary,
+        color_primary_dark: quarter.color_primary_dark,
+      };
+    });
+
+    res.send(quarters);
+  } catch (error) {
+    res.status(500).send("Server error");
   }
-);
+});
 
-router.get(
-  "/:lang/quarters/:quarter_id",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    try {
-      const { lang, quarter_id } = req.params;
+router.get("/:lang/quarters/:quarter_id", async (req, res) => {
+  try {
+    const { lang, quarter_id } = req.params;
 
-      const sabbathSchool = await SabbathSchool.findOne({
-        "quarters.index": `${lang}_${quarter_id}`,
-      });
+    const sabbathSchool = await SabbathSchool.findOne({
+      "quarters.index": `${lang}_${quarter_id}`,
+    });
 
-      if (!sabbathSchool)
-        return res
-          .status(404)
-          .send("The quarter with the given ID was not found.");
+    if (!sabbathSchool)
+      return res
+        .status(404)
+        .send("The quarter with the given ID was not found.");
 
-      const quarter = sabbathSchool.quarters.find(
-        (q) => q.index === `${lang}_${quarter_id}`
-      );
+    const quarter = sabbathSchool.quarters.find(
+      (q) => q.index === `${lang}_${quarter_id}`
+    );
+    const newQuarter = {
+      title: quarter.title,
+      description: quarter.description,
+      human_date: quarter.human_date,
+      start_date: quarter.start_date,
+      end_date: quarter.end_date,
+      cover: quarter.cover,
+      color_primary: quarter.color_primary,
+      color_primary_dark: quarter.color_primary_dark,
+    };
 
-      res.send(quarter);
-    } catch (error) {
-      res.status(500).send("Server error");
-    }
+    res.send(newQuarter);
+  } catch (error) {
+    res.status(500).send("Server error");
   }
-);
+});
 
 router.put(
   "/:lang/quarters/:quarter_id",

@@ -12,8 +12,11 @@ const intrductions = require("../routes/introductions");
 const users = require("../routes/users");
 const auth = require("../routes/auth");
 const path = require("path");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
 module.exports = function (app) {
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   app.use(express.json());
   app.use(cors);
   app.use("/api/v1", languages);

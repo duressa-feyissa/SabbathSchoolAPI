@@ -4,6 +4,8 @@
   "description": "Sabbath School is a function of the Seventh-day Adventist Church, Seventh Day Baptist, Church of God, some other sabbatarian denominations, usually comprising a song service and Bible study lesson on the Sabbath. It is usually held before the church service on Saturday morning, but this may vary.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,5 +31,9 @@
     "multer": "^1.4.5-lts.1",
     "nodemon": "^2.0.22",
     "winston": "^3.9.0"
+  },
+  "devDependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

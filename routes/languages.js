@@ -6,41 +6,31 @@ const { Introduction } = require("../models/introduction");
 const authenticate = require("../middleWare/authentication");
 const authorize = require("../middleWare/authorization");
 
-router.get(
-  "/",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    const { sort, order } = req.params;
-    let languages = [];
+router.get("/", async (req, res) => {
+  const { sort, order } = req.params;
+  let languages = [];
 
-    if (sort) {
-      languages = await SabbathSchool.find()
-        .sort({ [sort]: order && order === "desc" ? -1 : 1 })
-        .select("name code");
-    } else {
-      languages = await SabbathSchool.find().sort().select("name code");
-    }
-
-    res.send(languages);
+  if (sort) {
+    languages = await SabbathSchool.find()
+      .sort({ [sort]: order && order === "desc" ? -1 : 1 })
+      .select("name code");
+  } else {
+    languages = await SabbathSchool.find().sort().select("name code");
   }
-);
 
-router.get(
-  "/:lang",
-  authenticate,
-  authorize(["admin", "user"]),
-  async (req, res) => {
-    const language = await SabbathSchool.findOne({
-      code: req.params.lang,
-    }).select("name code");
-    if (!language)
-      return res
-        .status(404)
-        .send("The language with the given code was not found.");
-    res.send(language);
-  }
-);
+  res.send(languages);
+});
+
+router.get("/:lang", async (req, res) => {
+  const language = await SabbathSchool.findOne({
+    code: req.params.lang,
+  }).select("name code");
+  if (!language)
+    return res
+      .status(404)
+      .send("The language with the given code was not found.");
+  res.send(language);
+});
 
 router.post("/", authenticate, authorize(["admin"]), async (req, res) => {
   const { error } = validateLanguage(req.body);
