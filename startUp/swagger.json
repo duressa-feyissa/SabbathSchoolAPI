@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "AiEd Learning Assistant",
+    "title": "Sabbath School API",
     "version": "1.0.0",
-    "description": "AiEd Learning Assistant API Documentation"
+    "description": "API for Sabbath School App to manage languages, quarters, lessons, days and users"
   },
   "security": [
     {
